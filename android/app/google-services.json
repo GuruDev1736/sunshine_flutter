@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1074719227893",
+    "project_id": "safarsetu-1bcab",
+    "storage_bucket": "safarsetu-1bcab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074719227893:android:975fa03939acde869e2abc",
+        "android_client_info": {
+          "package_name": "com.example.sunshine_holiday_packages"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1074719227893-aubdo82o9m1i99d9c253oln7mprpuoc7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sunshine_holiday_packages",
+            "certificate_hash": "c7b52916f3052148fa593aa667ff7db154c951f4"
+          }
+        },
+        {
+          "client_id": "1074719227893-vdt7blqp60mev7ua1bf0mm0s0ouq5h9i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOLBGhOOI0pYBOu7q7w0CY4d8iwqN8DGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1074719227893-vdt7blqp60mev7ua1bf0mm0s0ouq5h9i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1074719227893-rn2qbb88uhg78jui07vun0a616a1gu4l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sunshineHolidayPackages"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
