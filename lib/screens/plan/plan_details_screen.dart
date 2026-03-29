@@ -337,43 +337,6 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
     return null;
   }
 
-  String _getDestinationImageUrl(String destination, TravelPlan plan) {
-    // Use the best/first popular place's dynamically fetched image
-    try {
-      if (destination.isEmpty) {
-        print('❌ Destination name is empty');
-        return 'https://via.placeholder.com/800x600/FF9800/ffffff?text=No+Destination';
-      }
-
-      print('\n📸 FETCHING DESTINATION LANDMARK IMAGE');
-      print('   Destination: $destination');
-
-      // PRIORITY 1: Use the best/first popular place's image if available
-      if (plan.popularPlaces.isNotEmpty) {
-        final bestMonument =
-            plan.popularPlaces.first; // First place is the "best" monument
-        if (bestMonument.imageUrl != null &&
-            bestMonument.imageUrl!.isNotEmpty) {
-          print('✓ Using Best Monument Image: ${bestMonument.name}');
-          print('   Image URL: ${bestMonument.imageUrl}');
-          print('   Category: ${bestMonument.category}');
-          return bestMonument.imageUrl!;
-        }
-      }
-
-      // FALLBACK: Use a generic destination landmark image from Unsplash
-      final fallbackUrl =
-          'https://source.unsplash.com/600x400/?${Uri.encodeComponent(destination)},landmark,monument';
-      print('✓ Using Dynamic Destination Landmark Image');
-      print('   URL: $fallbackUrl');
-
-      return fallbackUrl;
-    } catch (e) {
-      print('❌ Error generating landmark image URL: $e');
-      return 'https://via.placeholder.com/800x600/FF9800/ffffff?text=Destination+Image';
-    }
-  }
-
   void _submitReview(TravelPlan plan) async {
     if (_userRating == 0) {
       ScaffoldMessenger.of(
@@ -1191,92 +1154,122 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
               bottomLeft: Radius.circular(16),
               bottomRight: Radius.circular(16),
             ),
-            child: CachedNetworkImage(
-              imageUrl:
-                  _monumentImageUrl ??
-                  _getDestinationImageUrl(plan.destination, plan),
-              fit: BoxFit.cover,
-              cacheKey: 'destination_${plan.id}',
-              memCacheHeight: 600,
-              memCacheWidth: 800,
-              progressIndicatorBuilder: (context, url, downloadProgress) {
-                return Container(
-                  color: AppColors.veryLightGrey,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          value: downloadProgress.progress,
+            child: _monumentImageUrl != null && _monumentImageUrl!.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: _monumentImageUrl!,
+                    fit: BoxFit.cover,
+                    cacheKey: 'destination_${plan.id}',
+                    memCacheHeight: 600,
+                    memCacheWidth: 800,
+                    progressIndicatorBuilder: (context, url, downloadProgress) {
+                      return Container(
+                        color: AppColors.veryLightGrey,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                value: downloadProgress.progress,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'Loading ${plan.destination} landmark...',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Loading ${plan.destination} landmark...',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              errorWidget: (context, url, error) {
-                print('\n❌ LANDMARK IMAGE LOAD FAILED');
-                print('   Destination: ${plan.destination}');
-                print('   URL: $url');
-                print('   Error type: ${error.runtimeType}');
-                print('   Error: $error');
+                      );
+                    },
+                    errorWidget: (context, url, error) {
+                      print('\n❌ LANDMARK IMAGE LOAD FAILED');
+                      print('   Destination: ${plan.destination}');
+                      print('   URL: $url');
+                      print('   Error type: ${error.runtimeType}');
+                      print('   Error: $error');
 
-                // Return a beautiful gradient as fallback with destination name
-                return Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.darkOrange.withOpacity(0.8),
-                        AppColors.darkOrange.withOpacity(0.5),
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.landscape,
-                        size: 100,
-                        color: Colors.white.withOpacity(0.7),
-                      ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                      // Return a beautiful gradient as fallback with destination name
+                      return Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppColors.darkOrange.withOpacity(0.8),
+                              AppColors.darkOrange.withOpacity(0.5),
+                            ],
+                          ),
+                        ),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              plan.destination,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headlineSmall
-                                  ?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                            Icon(
+                              Icons.landscape,
+                              size: 100,
+                              color: Colors.white.withOpacity(0.7),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Your Travel Destination',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: Colors.white.withOpacity(0.8),
+                            const SizedBox(height: 16),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    plan.destination,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Your Travel Destination',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Colors.white.withOpacity(0.8),
+                                        ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
+                      );
+                    },
+                  )
+                : Container(
+                    color: AppColors.veryLightGrey,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.landscape,
+                            size: 100,
+                            color: Colors.grey.withOpacity(0.7),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            plan.destination,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                );
-              },
-            ),
           ),
           // Gradient overlay
           Positioned(
